@@ -52,34 +52,24 @@ def translate_text_in_code(file_path, source_lang='en', target_lang='fr'):
 
     # Expression régulière pour capturer le texte entre guillemets
     pattern = r'\"(.*?)(?<!\\)\"'
-    matches = re.findall(pattern, content, re.DOTALL)
-
-    print(f"[DEBUG] Nombre de textes trouvés : {len(matches)}")
+    matches = re.findall(pattern, content)
 
     # Initialisation du traducteur
     translator = GoogleTranslator(source=source_lang, target=target_lang)
 
-    # Créer une liste pour les textes à traduire
-    texts_to_translate = []
-    for match in matches:
+    # Traduire chaque texte individuellement
+    for i, match in enumerate(matches, start=1):
         if is_translatable(match):
-            texts_to_translate.append(match)
-
-    # Traduire les textes en lot
-    if texts_to_translate:
-        try:
-            total_texts = len(texts_to_translate)
-            translated_texts = translator.translate_batch(texts_to_translate)
-
-            # Affichage de l'état d'avancement
-            for i, (original, translated) in enumerate(zip(texts_to_translate, translated_texts), start=1):
-                content = content.replace(f'"{original}"', f'"{translated}"')
-                print(f"[DEBUG] Texte traduit {i}/{total_texts} : {translated[:50]}...")  # Affiche les 50 premiers caractères du texte traduit
-                print(f"[DEBUG] Avancement : {i}/{total_texts} ({(i / total_texts) * 100:.2f}%)")
-        except Exception as e:
-            print(f"[DEBUG] Exception lors de la traduction : {e}")
-    else:
-        print(f"[DEBUG] Aucun texte traduisible trouvé dans le fichier {file_path}")
+            try:
+                translated = translator.translate(match)
+                print(f"[DEBUG] Texte avant traduction {i}/{len(matches)} : {match}")  # Affiche le texte trouvé avant la traduction
+                content = content.replace(f'"{match}"', f'"{translated}"')
+                print(f"[DEBUG] Texte traduit {i}/{len(matches)} : {translated}")  # Affiche le texte traduit
+               # print(f"[DEBUG] Avancement : {i}/{len(matches)} ({(i / len(matches)) * 100:.2f}%)")  # Affiche l'avancement
+            except Exception as e:
+                print(f"[DEBUG] Exception lors de la traduction du texte '{match}': {e}")
+        else:
+            print(f"[DEBUG] Texte non traduisible {i}/{len(matches)} : {match}")  # Affiche un message pour les textes non traduisibles
 
     # Écrire le contenu traduit dans le sous-dossier 'translated_files'
     translated_file = os.path.join(translated_directory, f'translated_{os.path.basename(file_path)}')
