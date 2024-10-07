@@ -16,7 +16,7 @@ else:
     print(f"[DEBUG] Dossier de traduction déjà existant : {translated_directory}")
 
 # Liste des extensions de fichiers à ne pas traduire
-file_extensions = ['.ogg', '.mp3', '.wav', '.jpg', '.png', '.webm']
+file_extensions = ['.ogg', '.mp3', '.wav', '.jpg', '.png', '.webm', '.ttf']
 
 # Fonction pour déterminer si un texte doit être traduit
 def is_translatable(text):
